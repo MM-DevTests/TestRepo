@@ -1,0 +1,22 @@
+name: Deployment Guard
+
+on:
+  workflow_call:
+    outputs:
+      allow:
+        description: "Whether deployment is allowed"
+        value: ${{ jobs.check.outputs.allow }}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      allow: ${{ steps.check.outputs.allow }}
+    steps:
+      - id: check
+        run: |
+          if [ -z "${{ vars.allow_deployment }}" ] || [ "${{ vars.allow_deployment }}" = "true" ]; then
+            echo "allow=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "allow=false" >> "$GITHUB_OUTPUT"
+          fi
