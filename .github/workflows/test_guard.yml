@@ -1,4 +1,4 @@
-name: Test Guard Usage
+name: Deployment Workflow
 
 on:
   workflow_dispatch:
@@ -6,17 +6,19 @@ on:
 jobs:
   guard:
     uses: MM-DevTests/SharedRepo/.github/workflows/deployment_guard.yml@main
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  test:
+  deploy:
     needs: guard
     runs-on: ubuntu-latest
     if: ${{ needs.guard.outputs.allow == 'true' }}
     steps:
-      - run: echo "✅ Guard passed, running tests..."
+      - run: echo "🚀 Deployment running..."
 
-  skipped-test:
+  blocked:
     needs: guard
     runs-on: ubuntu-latest
     if: ${{ needs.guard.outputs.allow != 'true' }}
     steps:
-      - run: echo "🚫 Guard blocked, tests skipped."
+      - run: echo "🚫 Deployment blocked by org guard."
