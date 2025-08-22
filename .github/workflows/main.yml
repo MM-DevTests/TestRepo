@@ -1,19 +1,33 @@
 name: Test Deployment Guard
-
-on:
-  workflow_dispatch:
+on: { workflow_dispatch: {} }
 
 jobs:
-  guarded-job:
+  gate:
     runs-on: ubuntu-latest
-    if: ${{ !vars.allow_deployment || toLower(vars.allow_deployment) == 'true' }}
+    outputs:
+      allow: ${{ steps.gate.outputs.allow }}
     steps:
-      - name: Should run if allow_deployment is missing or set to true
-        run: echo "✅ Deployment allowed (or var not defined)"
+      - id: gate
+        shell: bash
+        run: |
+          val="${{ vars.allow_deployment }}"
+          val="${val,,}"  # lowercase in bash
+          if [[ -z "$val" || "$val" == "true" ]]; then
+            echo "allow=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "allow=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  guarded-job:
+    needs: gate
+    if: ${{ needs.gate.outputs.allow == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "✅ Deployment allowed (missing or true)"
 
   blocked-job:
+    needs: gate
+    if: ${{ needs.gate.outputs.allow != 'true' }}
     runs-on: ubuntu-latest
-    if: ${{ vars.allow_deployment && toLower(vars.allow_deployment) != 'true' }}
     steps:
-      - name: Should run if allow_deployment is set and not true
-        run: echo "🚫 Deployment blocked (allow_deployment=${{ vars.allow_deployment }})"
+      - run: echo "🚫 Deployment blocked (allow_deployment=${{ vars.allow_deployment }})"
