@@ -4,21 +4,46 @@ on:
   workflow_dispatch:
 
 jobs:
+  # -------------------------
+  # Guard job: checks org-level deployment flag
+  # -------------------------
   guard:
     uses: MM-DevTests/SharedRepo/.github/workflows/deployment_guard.yml@main
-    with:
-      allow_deployment: ${{ vars.ALLOW_DEPLOYMENTS }}
 
-  deploy:
+  # -------------------------
+  # Deployment Job A
+  # -------------------------
+  deploy_a:
     needs: guard
     runs-on: ubuntu-latest
     if: ${{ needs.guard.outputs.allow == 'true' }}
     steps:
-      - run: echo "🚀 Deployment running..."
+      - name: Deploy Application A
+        run: |
+          echo "🚀 Deployment A running..."
+          # Insert deployment A steps here
 
+  # -------------------------
+  # Deployment Job B
+  # -------------------------
+  deploy_b:
+    needs: guard
+    runs-on: ubuntu-latest
+    if: ${{ needs.guard.outputs.allow == 'true' }}
+    steps:
+      - name: Deploy Application B
+        run: |
+          echo "🚀 Deployment B running..."
+          # Insert deployment B steps here
+
+  # -------------------------
+  # Optional blocked notification
+  # -------------------------
   blocked:
     needs: guard
     runs-on: ubuntu-latest
     if: ${{ needs.guard.outputs.allow != 'true' }}
     steps:
-      - run: echo "🚫 Deployment blocked by org guard."
+      - name: Deployment Blocked
+        run: |
+          echo "🚫 Deployment blocked by org guard."
