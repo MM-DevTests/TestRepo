@@ -5,7 +5,7 @@ on:
 
 jobs:
   guard:
-    uses: MM-DevTests/SharedRepo/.github/workflows/deployment-guard.yml@main
+    uses: MM-DevTests/SharedRepo/.github/workflows/deployment_guard.yml@main
 
   test:
     needs: guard
