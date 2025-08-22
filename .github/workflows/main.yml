@@ -1,0 +1,19 @@
+name: Test Deployment Guard
+
+on:
+  workflow_dispatch:
+
+jobs:
+  guarded-job:
+    runs-on: ubuntu-latest
+    if: ${{ !vars.allow_deployment || toLower(vars.allow_deployment) == 'true' }}
+    steps:
+      - name: Should run if allow_deployment is missing or set to true
+        run: echo "✅ Deployment allowed (or var not defined)"
+
+  blocked-job:
+    runs-on: ubuntu-latest
+    if: ${{ vars.allow_deployment && toLower(vars.allow_deployment) != 'true' }}
+    steps:
+      - name: Should run if allow_deployment is set and not true
+        run: echo "🚫 Deployment blocked (allow_deployment=${{ vars.allow_deployment }})"
