@@ -6,6 +6,8 @@ on:
 jobs:
   guard:
     uses: MM-DevTests/SharedRepo/.github/workflows/deployment_guard.yml@main
+    with:
+      allow_deployment: ${{ vars.ALLOW_DEPLOYMENT }}
 
   deploy:
     needs: guard
