@@ -1,0 +1,22 @@
+name: Test Guard Usage
+
+on:
+  workflow_dispatch:
+
+jobs:
+  guard:
+    uses: ./.github/workflows/deployment-guard.yml
+
+  test:
+    needs: guard
+    runs-on: ubuntu-latest
+    if: ${{ needs.guard.outputs.allow == 'true' }}
+    steps:
+      - run: echo "✅ Guard passed, running tests..."
+
+  skipped-test:
+    needs: guard
+    runs-on: ubuntu-latest
+    if: ${{ needs.guard.outputs.allow != 'true' }}
+    steps:
+      - run: echo "🚫 Guard blocked, tests skipped."
