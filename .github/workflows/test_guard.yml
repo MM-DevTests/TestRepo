@@ -42,8 +42,7 @@ jobs:
   blocked:
     needs: guard
     runs-on: ubuntu-latest
-    if: ${{ needs.guard.outputs.allow != 'true' }}
     steps:
       - name: Deployment Blocked
         run: |
-          echo "🚫 Deployment blocked by org guard."
+          echo "🚫 Deployment blocked by system administrator."
